@@ -1,0 +1,40 @@
+{
+  "name": "sanctum-keeper",
+  "version": "1.0.0",
+  "description": "Local-first, safety-focused desktop file organizer",
+  "main": "src/main/main.js",
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test tests/*.test.js",
+    "dist": "electron-builder --win nsis"
+  },
+  "keywords": [
+    "electron",
+    "file-organizer",
+    "desktop"
+  ],
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^33.4.11",
+    "electron-builder": "^25.1.8"
+  },
+  "dependencies": {
+    "chokidar": "^4.0.3"
+  },
+  "build": {
+    "appId": "com.sanctumkeeper.app",
+    "productName": "Sanctum Keeper",
+    "files": [
+      "src/**/*",
+      "package.json",
+      "README.md",
+      "PRESENTATION_GUIDE.md"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "directories": {
+      "output": "dist"
+    }
+  }
+}
