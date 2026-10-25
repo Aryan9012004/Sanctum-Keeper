@@ -1,0 +1,8 @@
+const test = require('node:test'); const assert = require('node:assert/strict'); const fs = require('node:fs/promises'); const os = require('node:os'); const path = require('node:path');
+const { moveSafely, collisionSafePath, isWithin, hashFile } = require('../src/main/services/file-mover');
+async function temp(){return fs.mkdtemp(path.join(os.tmpdir(),'sanctum-test-'))}
+test('moves without overwriting and generates numbered names', async()=>{const root=await temp();const src=path.join(root,'a.txt'),dir=path.join(root,'out'),dest=path.join(dir,'a.txt');await fs.mkdir(dir);await fs.writeFile(src,'new');await fs.writeFile(dest,'old');const r=await moveSafely(src,dest);assert.equal(path.basename(r.destination),'a (1).txt');assert.equal(await fs.readFile(dest,'utf8'),'old');assert.equal(await fs.readFile(r.destination,'utf8'),'new');});
+test('refuses temporary files', async()=>{const root=await temp(),src=path.join(root,'a.tmp');await fs.writeFile(src,'x');await assert.rejects(moveSafely(src,path.join(root,'out','a.tmp')),/Temporary/);});
+test('path containment guard rejects traversal',()=>{assert.equal(isWithin('/safe','/safe/a.txt'),true);assert.equal(isWithin('/safe','/safe/../outside.txt'),false)});
+test('SHA-256 hash is stable for identical content',async()=>{const root=await temp(),a=path.join(root,'a'),b=path.join(root,'b');await fs.writeFile(a,'same');await fs.writeFile(b,'same');assert.equal(await hashFile(a),await hashFile(b));});
+test('collision resolver returns original when free',async()=>{const root=await temp(),p=path.join(root,'x.pdf');assert.equal(await collisionSafePath(p),p)});
