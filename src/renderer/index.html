@@ -1,0 +1,250 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sanctum Keeper</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="app-shell">
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-mark">SK</div>
+                <div><strong>Sanctum Keeper</strong><small>FILE ORGANIZATION</small></div>
+            </div>
+            <nav id="nav"><button class="nav-item active" data-page="dashboard"><span>◈</span> Dashboard</button><button
+                    class="nav-item" data-page="organize"><span>▤</span> Organize Files</button><button class="nav-item"
+                    data-page="rules"><span>⌘</span> Custom Rules</button><button class="nav-item"
+                    data-page="duplicates"><span>⧉</span> Duplicate Finder</button><button class="nav-item"
+                    data-page="history"><span>↺</span> History & Undo</button><button class="nav-item"
+                    data-page="settings"><span>⚙</span> Settings</button></nav>
+            <div class="sidebar-bottom">
+                <div class="local-pill"><i></i> Local-first · Private</div><small>Sanctum Keeper v1.0.0</small>
+            </div>
+        </aside>
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <p class="eyebrow">YOUR FILES, IN ORDER</p>
+                    <h1 id="pageTitle">Dashboard</h1>
+                </div>
+                <div class="top-actions"><span class="status"><i id="autoDot"></i><span id="autoLabel">Auto mode
+                            off</span></span><button class="button secondary" id="chooseFolderTop">Choose
+                        folder</button></div>
+            </header>
+            <div id="toast" class="toast hidden"></div>
+            <section class="page active" id="page-dashboard">
+                <div class="welcome panel">
+                    <div>
+                        <p class="eyebrow accent">WELCOME BACK</p>
+                        <h2>A calmer space for your files.</h2>
+                        <p>Scan a folder, preview every planned move, and organize with safety built in.</p><button
+                            class="button primary" data-go="organize">Start organizing <span>→</span></button>
+                    </div>
+                    <div class="welcome-art">
+                        <div class="orb orb-one"></div>
+                        <div class="orb orb-two"></div>
+                        <div class="folder-illustration">▰</div>
+                        <div class="mini-file file-a">PDF</div>
+                        <div class="mini-file file-b">IMG</div>
+                        <div class="mini-file file-c">ZIP</div>
+                    </div>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card"><span class="stat-icon violet">▤</span><span class="stat-label">Files
+                            scanned</span><strong id="statScanned">0</strong><small>Current folder scan</small></div>
+                    <div class="stat-card"><span class="stat-icon green">✓</span><span class="stat-label">Files
+                            organized</span><strong id="statOrganized">0</strong><small>Successful moves
+                            recorded</small></div>
+                    <div class="stat-card"><span class="stat-icon amber">Ⅱ</span><span
+                            class="stat-label">Skipped</span><strong id="statSkipped">0</strong><small>Kept safely in
+                            place</small></div>
+                    <div class="stat-card"><span class="stat-icon red">!</span><span
+                            class="stat-label">Failed</span><strong id="statFailed">0</strong><small>Review in
+                            history</small></div>
+                </div>
+                <div class="two-col">
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <h3>Category overview</h3>
+                                <p>Files found in the latest scan</p>
+                            </div><button class="text-button" data-go="organize">View files →</button>
+                        </div>
+                        <div id="categoryOverview" class="category-list empty-state">Choose a folder and scan to see
+                            categories.</div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-heading">
+                            <div>
+                                <h3>Recent activity</h3>
+                                <p>Your latest file operations</p>
+                            </div><button class="text-button" data-go="history">View history →</button>
+                        </div>
+                        <div id="recentActivity" class="activity-list empty-state">No activity yet. Your operations will
+                            appear here.</div>
+                    </div>
+                </div>
+            </section>
+            <section class="page" id="page-organize">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Choose a folder to organize</h3>
+                            <p>Only files directly inside the selected folder are scanned.</p>
+                        </div><span class="safe-tag">Preview first</span>
+                    </div>
+                    <div class="folder-row">
+                        <div class="folder-icon">▰</div>
+                        <div class="folder-info"><strong id="folderPath">No folder selected</strong><small
+                                id="folderSubtext">Select a test folder to get started</small></div><button
+                            class="button secondary" id="chooseFolder">Browse folders</button><button
+                            class="button primary" id="scanFolder" disabled>Scan folder</button>
+                    </div>
+                </div>
+                <div class="panel table-panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Organization preview</h3>
+                            <p id="previewSummary">Scan a folder to preview planned destinations. Nothing moves during a
+                                scan.</p>
+                        </div><button class="button primary" id="organizeBtn" disabled>Confirm & organize</button>
+                    </div>
+                    <div class="toolbar"><input id="fileSearch" type="search" placeholder="Search filenames…"><select
+                            id="categoryFilter">
+                            <option value="all">All categories</option>
+                        </select><span id="fileCount" class="muted">0 files</span></div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>FILE NAME</th>
+                                    <th>TYPE</th>
+                                    <th>SIZE</th>
+                                    <th>DESTINATION</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="fileRows">
+                                <tr>
+                                    <td colspan="5" class="empty-state">No files to show yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <section class="page" id="page-rules">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Custom rules</h3>
+                            <p>Custom rules run before default extension categories. Use a filename prefix or extension.
+                            </p>
+                        </div>
+                    </div>
+                    <form id="ruleForm" class="rule-form"><label>Rule name<input id="ruleName" required maxlength="40"
+                                placeholder="College assignments"></label><label>Match type<select id="ruleType">
+                                <option value="prefix">Filename starts with</option>
+                                <option value="extension">Extension equals</option>
+                            </select></label><label>Match value<input id="ruleMatch" required
+                                placeholder="assignment or .pdf"></label><label>Category folder<input id="ruleCategory"
+                                required maxlength="40" placeholder="Documents"></label><label>Optional subfolder<input
+                                id="ruleSubfolder" maxlength="60" placeholder="College"></label><button
+                            class="button primary" type="submit">Add rule</button></form>
+                    <div id="rulesList" class="rules-list empty-state">No custom rules added.</div>
+                </div>
+                <div class="notice">Keep rules specific. For example, prefix <code>invoice</code> and category
+                    <code>Documents</code> with subfolder <code>Finance</code> sends matching files to
+                    Documents/Finance.</div>
+            </section>
+            <section class="page" id="page-duplicates">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Find identical files</h3>
+                            <p>Uses SHA-256 content hashes. Files are never deleted or changed.</p>
+                        </div><button class="button primary" id="duplicateScan">Scan selected folder</button>
+                    </div>
+                    <p class="muted" id="duplicateFolderHint">Select a folder on the Organize Files page first.</p>
+                    <div id="duplicateResults" class="empty-state">Duplicate groups will appear here.</div>
+                </div>
+            </section>
+            <section class="page" id="page-history">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Operation history</h3>
+                            <p>Every completed move is recorded locally. Undo checks file integrity first.</p>
+                        </div><button class="button secondary" id="refreshHistory">Refresh</button>
+                    </div>
+                    <div class="table-wrap">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>FILE</th>
+                                    <th>STATUS</th>
+                                    <th>DATE</th>
+                                    <th>DESTINATION</th>
+                                    <th>ACTION</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historyRows">
+                                <tr>
+                                    <td colspan="5" class="empty-state">No operations recorded yet.</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+            <section class="page" id="page-settings">
+                <div class="panel">
+                    <div class="panel-heading">
+                        <div>
+                            <h3>Settings & safety</h3>
+                            <p>Sanctum Keeper works locally on this computer.</p>
+                        </div>
+                    </div>
+                    <div class="setting-row">
+                        <div><strong>Automatic organization</strong>
+                            <p>Watch the selected folder and organize new files after they appear stable.</p>
+                        </div><button class="button primary" id="autoToggle">Start Auto Mode</button>
+                    </div>
+                    <div class="notice warning">Auto mode moves files without a per-file confirmation. Use a dedicated
+                        test folder first. File stability checks reduce risk but cannot prove every download has
+                        completed.</div>
+                    <div class="setting-row">
+                        <div><strong>Local data</strong>
+                            <p>Configuration and operation history are stored in Electron's user data directory.</p>
+                        </div><span class="safe-tag">On this device</span>
+                    </div>
+                    <div class="setting-row">
+                        <div><strong>File handling</strong>
+                            <p>Temporary files are skipped. Existing files are never intentionally overwritten.
+                                Duplicate files are only reported.</p>
+                        </div><span class="safe-tag">Safety enabled</span>
+                    </div>
+                </div>
+            </section>
+            <div id="confirmModal" class="modal hidden">
+                <div class="modal-card">
+                    <div class="modal-symbol">!</div>
+                    <h2>Organize these files?</h2>
+                    <p id="confirmText">Review your planned changes before continuing.</p>
+                    <div class="modal-actions"><button class="button secondary"
+                            id="cancelOrganize">Cancel</button><button class="button primary" id="confirmOrganize">Yes,
+                            organize files</button></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    <script src="renderer.js"></script>
+</body>
+
+</html>
